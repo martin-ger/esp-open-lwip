@@ -46,6 +46,8 @@ lwip/netif/etharp.o \
 lwip/netif/slipif.o \
 lwip/netif/tunif.o \
 lwip/netif/espenc.o \
+lwip/netif/bridgeif.o \
+lwip/netif/bridgeif_fdb.o \
 lwip/app/espconn.o\
 lwip/app/espconn_udp.o\
 lwip/app/espconn_tcp.o\
