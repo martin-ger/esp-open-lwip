@@ -447,7 +447,7 @@
  * Also notice that this slows down input processing of every IP packet!
  */
 #ifndef ETHARP_TRUST_IP_MAC
-#define ETHARP_TRUST_IP_MAC             1
+#define ETHARP_TRUST_IP_MAC             0
 #endif
 
 /**
@@ -672,7 +672,9 @@
  * DHCP_DOES_ARP_CHECK==1: Do an ARP check on the offered address.
  */
 #ifndef DHCP_DOES_ARP_CHECK
-#define DHCP_DOES_ARP_CHECK             ((LWIP_DHCP) && (LWIP_ARP))
+// rc 12/16/19 this does not work with networks that do ARP caching so disabling
+//#define DHCP_DOES_ARP_CHECK             ((LWIP_DHCP) && (LWIP_ARP))
+#define DHCP_DOES_ARP_CHECK             0
 #endif
 
 /**
@@ -844,6 +846,10 @@
 #define DNS_MSG_SIZE                    512
 #endif
 
+/** DNS maximum number of retries when asking for a name, before "timeout". */
+#ifndef DNS_MAX_RETRIES
+#define DNS_MAX_RETRIES                 4
+#endif
 /** DNS_LOCAL_HOSTLIST: Implements a local host-to-address list. If enabled,
  *  you have to define
  *    #define DNS_LOCAL_HOSTLIST_INIT {{"host1", 0x123}, {"host2", 0x234}}
@@ -1214,7 +1220,7 @@
  * LWIP_HAVE_LOOPIF==1: Support loop interface (127.0.0.1) and loopif.c
  */
 #ifndef LWIP_HAVE_LOOPIF
-#define LWIP_HAVE_LOOPIF                1
+#define LWIP_HAVE_LOOPIF                0
 #endif
 
 /*
@@ -1226,7 +1232,19 @@
  * LWIP_HAVE_SLIPIF==1: Support slip interface and slipif.c
  */
 #ifndef LWIP_HAVE_SLIPIF
-#define LWIP_HAVE_SLIPIF                1
+#define LWIP_HAVE_SLIPIF                0
+#endif
+
+/*
+   ------------------------------------
+   ---------- ENC28J60IF options ----------
+   ------------------------------------
+*/
+/**
+ * LWIP_HAVE_ENC28J60IF==1: Support ENC28J60 ethernet interface and espenc.c
+ */
+#ifndef LWIP_HAVE_ENC28J60IF
+#define LWIP_HAVE_ENC28J60IF            0
 #endif
 
 /*

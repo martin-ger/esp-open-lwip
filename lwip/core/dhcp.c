@@ -171,6 +171,23 @@ static void dhcp_option_long(struct dhcp *dhcp, u32_t value);
 /* always add the DHCP options trailer to end and pad */
 static void dhcp_option_trailer(struct dhcp *dhcp);
 
+static int vendor_class_len = 0;
+static char * vendor_class_buf = NULL;
+err_t dhcp_set_vendor_class_identifier(uint8_t len, char *str) {
+  if (len == 0)
+    return ERR_ARG;
+
+  if (str == NULL)
+    return ERR_ARG;
+
+  vendor_class_buf = (char *)mem_zalloc(len + 1);
+  if (vendor_class_buf == NULL) {
+    return ERR_MEM;
+  }
+  vendor_class_len = len;
+  memcpy(vendor_class_buf, str, len);
+}
+
 /**
  * Back-off the DHCP client (because of a received NAK response).
  *
@@ -320,6 +337,18 @@ dhcp_select(struct netif *netif)
     }
 #endif /* LWIP_NETIF_HOSTNAME */
 
+    if (vendor_class_buf != NULL) {
+      const char *p = (const char*)vendor_class_buf;
+      u8_t namelen = (u8_t)os_strlen(p);
+      if (vendor_class_len > 0) {
+        LWIP_ASSERT("DHCP: vendor_class_len is too long!", vendor_class_len < 255);
+        dhcp_option(dhcp, DHCP_OPTION_US, vendor_class_len);
+        while (*p) {
+          dhcp_option_byte(dhcp, *p++);
+        }
+      }
+    }
+
     dhcp_option_trailer(dhcp);
     /* shrink the pbuf to the actual content length */
     pbuf_realloc(dhcp->p_out, sizeof(struct dhcp_msg) - DHCP_OPTIONS_LEN + dhcp->options_out_len);
@@ -349,7 +378,7 @@ dhcp_coarse_tmr()
   /* iterate through all network interfaces */
   while (netif != NULL) {
     /* only act on DHCP configured interfaces */
-    if (netif->dhcp != NULL) {
+    if ((netif->dhcp != NULL) && (netif->dhcp->state != DHCP_OFF)) {
       /* timer is active (non zero), and triggers (zeroes) now? */
       if (netif->dhcp->t2_timeout-- == 1) {
         LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE | LWIP_DBG_STATE, ("dhcp_coarse_tmr(): t2 timeout\n"));
@@ -382,7 +411,7 @@ dhcp_fine_tmr()
     /* only act on DHCP configured interfaces */
     if (netif->dhcp != NULL) {
       /*add DHCP retries processing by LiuHan*/
-      if (DHCP_MAXRTX != 0) {
+      if (DHCP_MAXRTX != 0 && netif->dhcp->state != DHCP_RENEWING) {
     	  if (netif->dhcp->tries >= DHCP_MAXRTX){
 			  os_printf("DHCP timeout\n");
 			  if (netif->dhcp_event != NULL)
@@ -915,6 +944,19 @@ dhcp_discover(struct netif *netif)
       }
     }
 #endif /* LWIP_NETIF_HOSTNAME */
+
+    if (vendor_class_buf != NULL) {
+      const char *p = (const char*)vendor_class_buf;
+      u8_t namelen = (u8_t)os_strlen(p);
+      if (vendor_class_len > 0) {
+        LWIP_ASSERT("DHCP: vendor_class_len is too long!", vendor_class_len < 255);
+        dhcp_option(dhcp, DHCP_OPTION_US, vendor_class_len);
+        while (*p) {
+          dhcp_option_byte(dhcp, *p++);
+        }
+      }
+    }
+
     dhcp_option(dhcp, DHCP_OPTION_PARAMETER_REQUEST_LIST, 12/*num options*/);
     dhcp_option_byte(dhcp, DHCP_OPTION_SUBNET_MASK);
     dhcp_option_byte(dhcp, DHCP_OPTION_ROUTER);
@@ -1096,6 +1138,18 @@ dhcp_renew(struct netif *netif)
     }
 #endif /* LWIP_NETIF_HOSTNAME */
 
+    if (vendor_class_buf != NULL) {
+      const char *p = (const char*)vendor_class_buf;
+      u8_t namelen = (u8_t)os_strlen(p);
+      if (vendor_class_len > 0) {
+        LWIP_ASSERT("DHCP: vendor_class_len is too long!", vendor_class_len < 255);
+        dhcp_option(dhcp, DHCP_OPTION_US, vendor_class_len);
+        while (*p) {
+          dhcp_option_byte(dhcp, *p++);
+        }
+      }
+    }
+
 #if 0
     dhcp_option(dhcp, DHCP_OPTION_REQUESTED_IP, 4);
     dhcp_option_long(dhcp, ntohl(dhcp->offered_ip_addr.addr));
@@ -1158,6 +1212,18 @@ dhcp_rebind(struct netif *netif)
       }
     }
 #endif /* LWIP_NETIF_HOSTNAME */
+
+    if (vendor_class_buf != NULL) {
+      const char *p = (const char*)vendor_class_buf;
+      u8_t namelen = (u8_t)os_strlen(p);
+      if (vendor_class_len > 0) {
+        LWIP_ASSERT("DHCP: vendor_class_len is too long!", vendor_class_len < 255);
+        dhcp_option(dhcp, DHCP_OPTION_US, vendor_class_len);
+        while (*p) {
+          dhcp_option_byte(dhcp, *p++);
+        }
+      }
+    }
 
 #if 0
     dhcp_option(dhcp, DHCP_OPTION_REQUESTED_IP, 4);

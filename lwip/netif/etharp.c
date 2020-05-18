@@ -912,6 +912,9 @@ etharp_output(struct netif *netif, struct pbuf *q, ip_addr_t *ipaddr)
 {
   struct eth_addr *dest, mcastaddr;
 
+  if (netif == NULL) {
+    return ERR_RTE;
+  }
   /* make room for Ethernet header - should not fail */
   if (pbuf_header(q, sizeof(struct eth_hdr)) != 0) {
     /* bail out */
@@ -1292,6 +1295,9 @@ etharp_raw(struct netif *netif, const struct eth_addr *ethsrc_addr,
 err_t
 etharp_request(struct netif *netif, ip_addr_t *ipaddr)
 {
+  if (netif == NULL) {
+    return ERR_RTE;
+  }
   LWIP_DEBUGF(ETHARP_DEBUG | LWIP_DBG_TRACE, ("etharp_request: sending ARP request.\n"));
   return etharp_raw(netif, (struct eth_addr *)netif->hwaddr, &ethbroadcast,
                     (struct eth_addr *)netif->hwaddr, &netif->ip_addr, &ethzero,
@@ -1313,6 +1319,10 @@ ethernet_input(struct pbuf *p, struct netif *netif)
   struct eth_hdr* ethhdr;
   u16_t type;
   s16_t ip_hdr_offset = SIZEOF_ETH_HDR;
+
+  if (netif == NULL) {
+    return ERR_RTE;
+  }
 
   if (p->len <= SIZEOF_ETH_HDR) {
     /* a packet with only an ethernet header (or less) is not valid for us modify by ives at 2014.4.24*/

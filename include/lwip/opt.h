@@ -827,6 +827,10 @@
 #define DNS_MSG_SIZE                    512
 #endif
 
+/** DNS maximum number of retries when asking for a name, before "timeout". */
+#ifndef DNS_MAX_RETRIES
+#define DNS_MAX_RETRIES                 4
+#endif
 /** DNS_LOCAL_HOSTLIST: Implements a local host-to-address list. If enabled,
  *  you have to define
  *    #define DNS_LOCAL_HOSTLIST_INIT {{"host1", 0x123}, {"host2", 0x234}}
