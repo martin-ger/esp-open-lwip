@@ -615,6 +615,10 @@ etharp_find_addr(struct netif *netif, ip_addr_t *ipaddr,
 {
   s8_t i;
 
+  if (netif == NULL) {
+    return ERR_RTE;
+  }
+
   LWIP_ASSERT("eth_ret != NULL && ip_ret != NULL",
     eth_ret != NULL && ip_ret != NULL);
 
@@ -1048,6 +1052,10 @@ etharp_query(struct netif *netif, ip_addr_t *ipaddr, struct pbuf *q)
   err_t result = ERR_MEM;
   s8_t i; /* ARP entry index */
 
+  if (netif == NULL) {
+    return ERR_RTE;
+  }
+
   /* non-unicast address? */
   if (ip_addr_isbroadcast(ipaddr, netif) ||
       ip_addr_ismulticast(ipaddr) ||
@@ -1298,6 +1306,7 @@ etharp_request(struct netif *netif, ip_addr_t *ipaddr)
   if (netif == NULL) {
     return ERR_RTE;
   }
+
   LWIP_DEBUGF(ETHARP_DEBUG | LWIP_DBG_TRACE, ("etharp_request: sending ARP request.\n"));
   return etharp_raw(netif, (struct eth_addr *)netif->hwaddr, &ethbroadcast,
                     (struct eth_addr *)netif->hwaddr, &netif->ip_addr, &ethzero,
