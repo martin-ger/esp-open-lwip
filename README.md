@@ -31,7 +31,7 @@ GND    <---> GND
 In addition you will need a transistor for decoupling GPIO15, otherwise your ESP will not boot any more, see: https://esp8266hints.wordpress.com/category/ethernet/
 
 Usage:
-Simply connect the enc28j60 as described above, include "lwip/netif" and "netif/espenc.h".
+Simply connect the enc28j60 as described above, include "lwip/netif.h" and "netif/espenc.h" and enable by setting the option LWIP_HAVE_ENC28J60IF in "lwipopts.h".
 A hardware reset in the ESP's init is optional, but it ensures that an ESP reset also resets the enc. It is done by toggeling GPIO4 (0 and 1), e.g. using the easygpio lib:
 ```
 #define ENC28J60_HW_RESET 4
